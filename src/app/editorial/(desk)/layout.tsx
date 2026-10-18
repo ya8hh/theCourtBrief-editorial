@@ -15,6 +15,9 @@ export default async function Layout({
         <Link href="/editorial">Newsroom</Link>
         <Link href="/editorial/upload">Upload PDF</Link>
         <Link href="/editorial/new">Write article</Link>
+        {user.roles?.some(
+          (r: { code: string }) => r.code === "strapi-super-admin",
+        ) && <Link href="/editorial/settings">AI providers</Link>}
         <a
           href={
             (process.env.CMS_PUBLIC_URL || "http://localhost:1337") + "/admin"

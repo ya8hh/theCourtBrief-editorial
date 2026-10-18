@@ -21,7 +21,7 @@ async function proxy(request: Request, context: Context) {
   const { path } = await context.params;
   const route = path.join("/");
   if (
-    !/^(?:config|overview|documents(?:\/[a-z0-9]+(?:\/(?:review|jobs))?)?|articles(?:\/[a-z0-9]+(?:\/action)?)?|jobs\/[a-f0-9-]+\/(?:retry|apply)|upload|logout)$/.test(
+    !/^(?:config|overview|ai\/(?:settings|credentials(?:\/[a-f0-9-]+(?:\/delete)?)?)|documents(?:\/[a-z0-9]+(?:\/(?:review|jobs))?)?|articles(?:\/[a-z0-9]+(?:\/action)?)?|jobs\/[a-f0-9-]+\/(?:retry|apply)|upload|logout)$/.test(
       route,
     )
   )

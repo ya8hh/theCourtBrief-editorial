@@ -259,7 +259,11 @@ export function SourceWorkspace({ initial }: { initial: any }) {
     setSource(row);
   }
   useEffect(() => {
-    if (!s.jobs.some((j: any) => ["queued", "running"].includes(j.state)))
+    if (
+      !s.jobs.some((j: any) =>
+        ["queued", "running", "waiting"].includes(j.state),
+      )
+    )
       return;
     const timer = setInterval(() => {
       refresh().catch((e) => setError(message(e)));
@@ -405,6 +409,40 @@ export function SourceWorkspace({ initial }: { initial: any }) {
           <p>
             Attempt {j.attempts} · {j.created_at}
           </p>
+          {j.progress && (
+            <div role="status">
+              <p>
+                {j.progress.phase || "Processing"}: {j.progress.completed || 0}{" "}
+                of {j.progress.total || 0} sections complete.{" "}
+                {j.progress.reusedSteps > 0
+                  ? `Reused ${j.progress.reusedSteps} saved steps.`
+                  : "Completed work is saved automatically."}
+              </p>
+              {j.progress.total > 0 && (
+                <progress
+                  value={j.progress.completed || 0}
+                  max={j.progress.total}
+                  aria-label="Document processing progress"
+                />
+              )}
+            </div>
+          )}
+          {j.state === "waiting" && (
+            <p role="status">
+              {j.progress?.waitingReason === "no_credentials" ? (
+                "Waiting for an enabled API key. Ask a super administrator to add one in AI providers."
+              ) : (
+                <>
+                  Waiting for provider quota. Automatically resumes after{" "}
+                  {j.next_run_at
+                    ? new Date(j.next_run_at).toLocaleString()
+                    : "the provider cooldown"}
+                  .
+                </>
+              )}{" "}
+              Completed sections are saved; no need to retry.
+            </p>
+          )}
           {j.error && <p role="alert">{j.error}</p>}
           {j.state === "failed" && (
             <button
