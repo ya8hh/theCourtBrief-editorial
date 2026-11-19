@@ -839,6 +839,33 @@ input:focus-visible {
   align-items: center;
   margin: 30px 0;
 }
+.editor-fieldset {
+  border: 1px solid #b2ada2;
+  padding: 16px 20px;
+  margin: 24px 0;
+}
+.editor-fieldset legend {
+  padding: 0 8px;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+}
+.court-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #b2ada2;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.court-choice input {
+  accent-color: #843c35;
+}
+.court-jurisdiction-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid #b2ada2;
+  color: #843c35;
+}
 .desk-actions button,
 .job-card button,
 .version button {

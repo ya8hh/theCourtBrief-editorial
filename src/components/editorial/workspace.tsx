@@ -41,6 +41,7 @@ export function Logout() {
 }
 export function Upload({ maxBytes }: { maxBytes: number }) {
   const [mode, setMode] = useState<"link" | "file">("link");
+  const [court, setCourt] = useState<"Supreme Court" | "High Court">("Supreme Court");
   const [duplicate, setDuplicate] = useState("");
   const [progress, setProgress] = useState(0),
     [busy, setBusy] = useState(false),
@@ -58,6 +59,7 @@ export function Upload({ maxBytes }: { maxBytes: number }) {
             const metadata = Object.fromEntries(form);
             const s = await api("documents", {
               ...metadata,
+              courtJurisdiction: court,
               officialSourceUrl: metadata.pdfUrl,
               judgmentDate: metadata.judgmentDate || null,
               generateArticle: true,
@@ -106,6 +108,7 @@ export function Upload({ maxBytes }: { maxBytes: number }) {
           delete metadata.files;
           const s = await api("documents", {
             ...metadata,
+            courtJurisdiction: court,
             judgmentDate: metadata.judgmentDate || null,
             fileId: uploaded[0].id,
             generateArticle: true,
@@ -137,6 +140,24 @@ export function Upload({ maxBytes }: { maxBytes: number }) {
           Upload PDF file
         </button>
       </div>
+      <fieldset className="editor-fieldset">
+        <legend>Which court issued this document?</legend>
+        <div className="desk-actions" role="radiogroup" aria-label="Court jurisdiction">
+          {(["Supreme Court", "High Court"] as const).map((option) => (
+            <label key={option} className="court-choice">
+              <input
+                type="radio"
+                name="courtJurisdiction"
+                value={option}
+                checked={court === option}
+                onChange={() => setCourt(option)}
+              />
+              {option}
+            </label>
+          ))}
+        </div>
+        <small>The selected court is sent with the PDF and used throughout AI analysis and draft generation.</small>
+      </fieldset>
       {mode === "link" ? (
         <label>
           Direct official PDF download link
@@ -147,7 +168,7 @@ export function Upload({ maxBytes }: { maxBytes: number }) {
             required
           />
           <small>
-            Paste the PDF URL from the official Supreme Court website. We read
+            Paste the PDF URL from the official {court} website. We read
             it automatically and keep the downloaded file only until
             publication.
           </small>
@@ -171,12 +192,12 @@ export function Upload({ maxBytes }: { maxBytes: number }) {
       </label>
       {mode === "file" && (
         <label>
-          Official Supreme Court source URL
+          Official {court} source URL
           <input
             name="officialSourceUrl"
             type="url"
             required
-            placeholder="https://www.sci.gov.in/…"
+            placeholder={court === "Supreme Court" ? "https://www.sci.gov.in/…" : "https://www.highcourt.gov.in/…"}
           />
         </label>
       )}
@@ -286,6 +307,9 @@ export function SourceWorkspace({ initial }: { initial: any }) {
     <>
       <p className="kicker">SOURCE DOCUMENT</p>
       <h1>{s.title}</h1>
+      <p className="court-jurisdiction-badge">
+        Issuing court: <strong>{s.courtJurisdiction || "Supreme Court"}</strong>
+      </p>
       <p>
         Uploaded by {s.uploadedBy || "CMS editor"} · {s.createdAt}
       </p>
